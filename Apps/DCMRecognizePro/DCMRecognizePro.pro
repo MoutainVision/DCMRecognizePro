@@ -11,6 +11,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = DCMRecognizePro
 TEMPLATE = app
 
+UI_DIR  = obj/Gui
+MOC_DIR = obj/Moc
+OBJECTS_DIR = obj/Obj
+
+
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -43,13 +48,17 @@ SOURCES += \
     mainwindow.cpp \
     recognizewdg.cpp \
     recheckwdg.cpp \
-    readdcmfile.cpp
+    readdcmfile.cpp \
+    Base/FunctionTransfer.cpp \
+    appconfig.cpp
 
 HEADERS += \
     mainwindow.h \
     recognizewdg.h \
     recheckwdg.h \
-    readdcmfile.h
+    readdcmfile.h \
+    Base/FunctionTransfer.h \
+    appconfig.h
 
 FORMS += \
     mainwindow.ui \
@@ -61,6 +70,6 @@ CONFIG(release, debug|release) {
     LIBS += -L"..\..\Bins\Release" -lLibCore
 }
 else {
-LIBS += -L"..\..\Dependencies\dcmtk-3.6.5\lib\Debug" -ldcmtk
-LIBS += -L"..\..\Bins\Debug" -lLibCore -lLibDistortionCorrection -lLibTinyXML
+    LIBS += -L"..\..\Dependencies\dcmtk-3.6.5\lib\Debug" -ldcmtk
+    LIBS += -L"..\..\Bins\Debug" -lLibCore -lLibDistortionCorrection -lLibTinyXML
 }

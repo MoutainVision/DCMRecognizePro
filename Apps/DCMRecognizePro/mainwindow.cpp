@@ -4,12 +4,18 @@
 #include <QDebug>
 #include <QMessageBox>
 
+#include "Base/FunctionTransfer.h"
+
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    FunctionTransfer::init(QThread::currentThreadId());
+
 
     mModel  = new QDirModel;
 
@@ -20,7 +26,11 @@ MainWindow::MainWindow(QWidget *parent) :
     mModel->setNameFilters(filters);
 
     ui->treeView->setModel(mModel);
-    ui->treeView->setRootIndex(mModel->index("G:/"));
+    ui->treeView->setRootIndex(mModel->index(Appconfig::AppFilePath_OpenFile));
+
+    ui->lineEdit_search->setText(Appconfig::AppFilePath_OpenFile);
+
+    ui->widget_img->installEventFilter(this);
 
 
     mRecognizeWdg  = nullptr;
@@ -46,18 +56,18 @@ void MainWindow::doubleClicked(QModelIndex index)
 
 
     QString dateTimeStr = QDateTime::currentDateTime().toString("MM-dd hh-mm-ss-zzz");
-    QString outFileName = QString(QStringLiteral("%1.jpg")).arg(dateTimeStr);
+    QString outFileName = QString(QStringLiteral("%1/%2.jpg")).arg(Appconfig::AppDataPath_Tmp).arg(dateTimeStr);
 
 
-    std::thread([&] {
-        //1.5秒循环
+    std::thread([=] {
         std::string errorStr;
         ReadDCMFile::readDCMFile(filePath.toLocal8Bit().toStdString(), outFileName.toLocal8Bit().toStdString(), errorStr);
 
-//        ReadDCMFile file;
-//        bool isSuc = file.readDCMFile(filePath.toLocal8Bit().toStdString(), outFileName.toLocal8Bit().toStdString(), errorStr);
+        FunctionTransfer::runInMainThread([=]()
+        {
+            this->setPreviewImg(QString("%1").arg(outFileName));
+        });
 
-//        qDebug() << errorStr.c_str() << isSuc;
         std::cout << errorStr << std::endl;
 
     }).detach();
@@ -87,7 +97,7 @@ void MainWindow::slotBtnClick(bool bClick)
             mRecognizeWdg = new RecognizeWdg;
         }
 
-        mRecognizeWdg->show();
+        mRecognizeWdg->showMaximized();
     }
     else if (QObject::sender() == ui->pushButton_recheck)
     {
@@ -95,7 +105,7 @@ void MainWindow::slotBtnClick(bool bClick)
         {
             mReCheckWdg = new ReCheckWdg;
         }
-        mReCheckWdg->show();
+        mReCheckWdg->showMaximized();
     }
     else if (QObject::sender() == ui->pushButton_search)
     {
@@ -108,15 +118,65 @@ void MainWindow::slotBtnClick(bool bClick)
             ui->lineEdit_search->setText(s);
         }
         else {
-            ui->lineEdit_search->setText("./");
+            ui->lineEdit_search->setText("");
         }
 
+        Appconfig::AppFilePath_OpenFile = s;
     }
 }
 
 void MainWindow::resizeEvent(QResizeEvent *e)
 {
     return QMainWindow::resizeEvent(e);
+}
+
+void MainWindow::setPreviewImg(QString filePath)
+{
+    qDebug() << __FUNCTION__ << filePath;
+    mPreviewPixImg.load(filePath);
+    update();
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *e)
+{
+    if (obj == ui->widget_img)
+    {
+        if (e->type() == QEvent::Paint)
+        {
+            QPainter  p(ui->widget_img);
+
+            if (!mPreviewPixImg.isNull())
+            {
+                int nX = 0;
+                int nY = 0;
+                int nWidth = 0;
+                int nHeight = 0;
+                int nW = mPreviewPixImg.width();
+                int nH = mPreviewPixImg.height();
+
+                double dRatioW = (double)(ui->widget_img->width()) / (double)nW;
+                double dRatioH = (double)(ui->widget_img->height()) / (double)nH;
+                double dRat = dRatioW > dRatioH? dRatioH : dRatioW;
+
+                nWidth = dRat * nW;
+                nHeight = dRat * nH;
+                nX = dRatioW > dRatioH? ((ui->widget_img->width()) - nWidth) / 2 : 0;
+                nY = dRatioW > dRatioH? 0 : ((ui->widget_img->height()) - nHeight) / 2;
+
+                QRect imgRect(nX, nY, nWidth, nHeight);
+
+//                QBrush b(QColor("#FFFFFF"));
+//                p.setBrush(b);
+                p.drawRect(ui->widget_img->rect());
+
+                p.drawPixmap(imgRect, mPreviewPixImg);
+
+                return true;
+            }
+        }
+    }
+
+    return QMainWindow::eventFilter(obj, e);
 }
 
 MainWindow::~MainWindow()
@@ -126,6 +186,12 @@ MainWindow::~MainWindow()
         delete mModel;
         mModel = nullptr;
     }
+
+    //save config
+    Appconfig::saveConfigFile();
+
+    //delete temp file
+    Appconfig::deleteAppTempFile(Appconfig::AppDataPath_Tmp);
 
     delete ui;
 }

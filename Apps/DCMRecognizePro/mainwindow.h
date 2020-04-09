@@ -14,11 +14,16 @@
 #include <qfileinfo.h>
 #include <QDateTime>
 
+#include <QPaintEvent>
+#include <QPainter>
+
 #include <thread>
 
 #include "recognizewdg.h"
 #include "recheckwdg.h"
 #include "readdcmfile.h"
+
+#include "appconfig.h"
 
 
 namespace Ui {
@@ -33,6 +38,8 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void setPreviewImg(QString filePath);
+
 private slots:
     void slotBtnClick(bool bClick);
 
@@ -45,6 +52,8 @@ private slots:
 protected:
     void resizeEvent(QResizeEvent *e);
 
+    bool eventFilter(QObject *obj, QEvent *e);
+
 private:
     Ui::MainWindow *ui;
 
@@ -54,6 +63,8 @@ private:
     RecognizeWdg *mRecognizeWdg;
     ReCheckWdg *mReCheckWdg;
 
+    QImage mPreviewImg;
+    QPixmap mPreviewPixImg;
 };
 
 #endif // MAINWINDOW_H

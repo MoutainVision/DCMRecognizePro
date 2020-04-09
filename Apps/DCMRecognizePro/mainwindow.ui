@@ -25,7 +25,7 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>300</width>
+        <width>450</width>
         <height>16777215</height>
        </size>
       </property>
@@ -58,7 +58,7 @@
      <widget class="QWidget" name="widget_right" native="true">
       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
        <item>
-        <widget class="QWidget" name="widget" native="true"/>
+        <widget class="QWidget" name="widget_img" native="true"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
