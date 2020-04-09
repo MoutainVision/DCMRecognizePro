@@ -26,3 +26,8 @@ Dlls/LibCore/Release
 Test/DCMDemo/DCMDemo.pro.user
 Apps/DCMRecognizePro/.qmake.stash
 .vs/
+Bins/Debug/1_test1.jpg
+Test/build-DCMDemo-Desktop_Qt_5_12_1_MSVC2017_32bit-Debug
+Test/build-DCMDemo-Desktop_Qt_5_12_1_MSVC2017_32bit-Release
+Apps/build-DCMRecognizePro-Desktop_Qt_5_12_1_MSVC2017_32bit-Debug
+Apps/build-DCMRecognizePro-Desktop_Qt_5_12_1_MSVC2017_32bit-Release

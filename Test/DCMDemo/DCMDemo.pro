@@ -41,8 +41,8 @@ CONFIG(release, debug|release) {
     LIBS += -L"..\..\Bins\Release" -lLibCore
 }
 else {
-LIBS += -L"..\..\Dependencies\dcmtk-3.6.5\lib\Debug" -ldcmtk
-LIBS += -L"..\..\Bins\Debug" -lLibCore -lLibDistortionCorrection -lLibTinyXML
+    LIBS += -L"..\..\Dependencies\dcmtk-3.6.5\lib\Debug" -ldcmtk
+    LIBS += -L"..\..\Bins\Debug" -lLibCore -lLibDistortionCorrection -lLibTinyXML
 }
 
 
