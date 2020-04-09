@@ -1,0 +1,54 @@
+#include "EventTimer.h"
+
+unsigned int EventTimer::addEvent(double interval, std::function<void()> action, bool isRepeat) 
+{
+	SchedulerEvent event(interval, this->timeline, action, isRepeat);
+	return this->eventQueue.insertNode(event);
+}
+
+void EventTimer::deleteEvent(unsigned int timerId) 
+{
+	this->eventQueue.deleteNode(timerId);
+}
+
+void EventTimer::loopForExecute() 
+{
+	std::unique_ptr<SchedulerEvent> top = this->eventQueue.getTopNode();
+	while (top != nullptr && top->deadline <= this->timeline) 
+	{
+		//如果已经到了执行的时间,新开一个子线程执行任务
+		std::thread t(top->action);
+		t.detach();    //子线程分离
+
+		if (top->isRepeat) {
+			//如果是重复事件,则重新添加
+			this->addEvent(top->interval, top->action, top->isRepeat);
+		}
+
+		//从堆中删除
+		this->eventQueue.deleteTopNode();
+		top = this->eventQueue.getTopNode();
+	}
+	//执行一次后等待一个周期
+	std::this_thread::sleep_for(this->tick);
+	//周期增1
+	this->timeline++;
+}
+
+void EventTimer::asyncStart() 
+{
+	if (!this->isStart)
+	{
+		std::thread daemon_thread(&EventTimer::syncStart, this);
+		daemon_thread.detach();     //从当前主线程分离
+	}
+}
+
+void EventTimer::syncStart() 
+{
+	if (!this->isStart) 
+	{
+		while (1)
+			this->loopForExecute();
+	}
+}
