@@ -1,5 +1,6 @@
 
 Apps/DCMRecognizePro/debug
+Apps/DCMRecognizePro/release
 Apps/DCMRecognizePro/Makefile
 Apps/DCMRecognizePro/Makefile.Debug
 Apps/DCMRecognizePro/Makefile.Release
@@ -7,13 +8,21 @@ Apps/DCMRecognizePro/DCMRecognizePro.pro.user
 Bins/Debug/*.ilk
 Bins/Debug/*.pdb
 Bins/Debug/*.exp
+Bins/Release/*.ilk
+Bins/Release/*.pdb
+Bins/Release/*.exp
 Dlls/LibCore/jpeg/Debug
+Dlls/LibCore/jpeg/Release
 Dlls/LibCore/png/Debug
+Dlls/LibCore/png/Release
 Dlls/LibDistortionCorrection/Debug
+Dlls/LibDistortionCorrection/Release
 Dlls/LibTinyXML/Debug
-Test/DCMDemo/DCMDemo.pro.user
 Dlls/LibTinyXML/Release
 Dlls/LibCore/zlib/Debug
+Dlls/LibCore/zlib/Release
 Dlls/LibCore/Debug
+Dlls/LibCore/Release
+Test/DCMDemo/DCMDemo.pro.user
 Apps/DCMRecognizePro/.qmake.stash
 .vs/
